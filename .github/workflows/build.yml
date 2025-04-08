@@ -57,3 +57,4 @@ jobs:
             out/make/**/*.zip
             out/make/**/*.AppImage
             out/make/**/*.dmg
+            config/logitech/**

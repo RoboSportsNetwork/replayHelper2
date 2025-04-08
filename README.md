@@ -68,6 +68,8 @@ Built executables are available in two places:
 
 ## Keyboard Shortcuts
 
+### Video Controls
+
 - `Ctrl + Space`: Play/Pause
 - `Ctrl + Shift + Left Arrow`: Jump back 15 seconds
 - `Ctrl + Shift + Right Arrow`: Jump forward 15 seconds
@@ -75,6 +77,67 @@ Built executables are available in two places:
 - `Ctrl + Shift + 2`: Set playback speed to 2x
 - `Ctrl + Shift + 4`: Set playback speed to 0.25x
 - `Ctrl + Shift + 5`: Set playback speed to 0.5x
+
+### Drawing Controls
+
+- `Escape`: Clear all drawings
+- `Ctrl + Shift + 6`: Set drawing color to green
+- `Ctrl + Shift + 7`: Set drawing color to yellow
+- `Ctrl + Shift + 8`: Set drawing color to red
+- `Ctrl + Shift + 9`: Set drawing color to blue
+- `Ctrl + Shift + 0`: Set drawing color to white
+
+### File Operations
+
+- `Ctrl + O`: Open video file
+- `Ctrl + D`: Set video directory
+- `F11` (Windows) or `Cmd + Ctrl + F` (Mac): Toggle full screen
+
+## Scroll Interactions
+
+- **Horizontal Scroll**: Scrub through the video timeline
+
+  - Scroll left to move backward in time
+  - Scroll right to move forward in time
+  - Scrolling speed is affected by current playback speed
+
+- **Vertical Scroll**: Adjust playback speed
+  - Scroll up to increase playback speed
+  - Scroll down to decrease playback speed
+  - Speed range: 0.1x to 4x
+  - Current speed is displayed in the bottom-right corner
+
+## Logitech MX Creative Console Configuration
+
+The application includes pre-configured profiles for the Logitech MX Creative console to enhance the video replay experience. Two configuration files are provided in the `config/logitech` directory:
+
+- `Replay Helper - Keys.lp5`: Configures the keyboard shortcuts for the MX Creative Keypad
+- `Replay Helper - Dial.lp5`: Configures the dial controls for the MX Creative Dialpad
+
+### Installation Instructions
+
+1. Open Logitech Options+ software
+2. Navigate to the "Profiles" section
+3. Click "Import Profile"
+4. Select the appropriate `.lp5` file from the `config/logitech` directory
+5. The profile will be automatically configured with the following mappings:
+
+#### MX Creative Keypad Configuration
+
+- All standard keyboard shortcuts are pre-configured
+- Optimized for quick access to video controls
+
+![Keypad Configuration Page 1](config/logitech/Keypad%20Config%20-%20Page%201.png)
+![Keypad Configuration Page 2](config/logitech/Keypad%20Config%20-%20Page%202.png)
+
+#### MX Creative Dialpad Configuration
+
+- Dial rotation: Adjusts playback speed
+- Dial press: Toggles play/pause
+
+![Dialpad Configuration](config/logitech/Dialpad%20Config.png)
+
+Note: Make sure to have Logitech Options+ software installed and running for these configurations to work properly.
 
 ## License
 
