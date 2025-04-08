@@ -25,14 +25,14 @@ const createMenu = (mainWindow: BrowserWindow) => {
       submenu: [
         {
           label: 'Open...',
-          accelerator: 'CmdOrCtrl+O',
+          accelerator: isMac ? 'Command+O' : 'Ctrl+O',
           click: async () => {
             mainWindow.webContents.send('video-file-selected', getLatestVideoUrl());
           },
         },
         {
           label: 'Set Directory...',
-          accelerator: 'CmdOrCtrl+D',
+          accelerator: isMac ? 'Command+D' : 'Ctrl+D',
           click: async () => {
             const result = await dialog.showOpenDialog({
               properties: ['openDirectory'],
@@ -54,7 +54,7 @@ const createMenu = (mainWindow: BrowserWindow) => {
       submenu: [
         {
           label: 'Toggle Full Screen',
-          accelerator: isMac ? 'Cmd+Ctrl+F' : 'F11',
+          accelerator: isMac ? 'Command+Control+F' : 'F11',
           click: () => {
             mainWindow.setFullScreen(!mainWindow.isFullScreen());
           },
@@ -87,12 +87,11 @@ const createWindow = () => {
   // and load the index.html of the app.
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
+    // Open the DevTools only in development
+    mainWindow.webContents.openDevTools();
   } else {
     mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
   }
-
-  // Open the DevTools.
-  mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished
