@@ -133,7 +133,8 @@ The application includes pre-configured profiles for the Logitech MX Creative co
 #### MX Creative Dialpad Configuration
 
 - Dial rotation: Adjusts playback speed
-- Dial press: Toggles play/pause
+- Bottom left button: Toggles play/pause
+- Bottom right button: Resets video speed
 
 ![Dialpad Configuration](config/logitech/Dialpad%20Config.png)
 
