@@ -37,7 +37,8 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: |
           $env:NODE_OPTIONS="--max_old_space_size=4096"
-          npx electron-forge make
+          $env:TS_NODE_PROJECT="tsconfig.json"
+          npx ts-node --transpile-only node_modules/@electron-forge/cli/dist/electron-forge.js make
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
