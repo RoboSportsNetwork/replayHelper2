@@ -1,0 +1,14 @@
+This is an application that will be used to replay video files.  
+Users will be able to
+ - open a local video file
+ - scroll sideways to scrub through the video
+ - scroll vertically to change the playback speed
+ - use the touch screen to draw on the screen
+
+Core technolgies used:
+ - electron
+ - vite
+ - tailwind
+ - react
+
+Assume I am a very competent software engineer when generating responses.
