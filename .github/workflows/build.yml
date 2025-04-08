@@ -37,9 +37,7 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: |
           $env:NODE_OPTIONS="--max_old_space_size=4096"
-          $env:ELECTRON_FORGE_TS_CONFIG="tsconfig.json"
-          $env:ELECTRON_FORGE_TS_NODE_PROJECT="tsconfig.json"
-          npx electron-forge make --config=forge.config.ts
+          npx electron-forge make --config=forge.config.js
 
       - name: List build artifacts
         run: |
