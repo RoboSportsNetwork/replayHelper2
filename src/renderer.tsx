@@ -82,7 +82,7 @@ export function App() {
   );
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (e.ctrlKey && e.code === 'Space') {
+    if (e.code === 'Space' || e.key === ' ') {
       e.preventDefault();
       if (videoRef.current?.paused) {
         videoRef.current?.play();
