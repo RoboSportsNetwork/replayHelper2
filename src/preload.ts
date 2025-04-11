@@ -12,6 +12,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   openFileDialog: () => ipcRenderer.invoke('open-file-dialog'),
   onVideoFileSelected: (callback: (url: string) => void) => {
     ipcRenderer.on('video-file-selected', (_event, url) => callback(url));
-  }
+  },
+  onVideoDirectoryChanged: (callback: (url: string) => void) => {
+    ipcRenderer.on('video-directory-changed', (_event, url) => callback(url));
+  },
 });
-

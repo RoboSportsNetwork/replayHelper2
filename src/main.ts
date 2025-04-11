@@ -24,10 +24,24 @@ const createMenu = (mainWindow: BrowserWindow) => {
       label: 'File',
       submenu: [
         {
-          label: 'Open...',
+          label: 'Open Latest...',
           accelerator: isMac ? 'Command+O' : 'Ctrl+O',
           click: async () => {
             mainWindow.webContents.send('video-file-selected', getLatestVideoUrl());
+          },
+        },
+        {
+          label: 'Open Exact...',
+          accelerator: isMac ? 'Command+Shift+O' : 'Ctrl+Shift+O',
+          click: async () => {
+            const result = await dialog.showOpenDialog({
+              properties: ['openFile'],
+              filters: [{ name: 'Videos', extensions: ['mp4', 'mov', 'avi', 'mkv'] }],
+            });
+
+            if (!result.canceled && result.filePaths.length > 0) {
+              mainWindow.webContents.send('video-file-selected', getVideoUrl(result.filePaths[0]));
+            }
           },
         },
         {
@@ -98,7 +112,7 @@ const createWindow = () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', () => {
-  startServer();
+  startServer(path.join(app.getPath('home'), 'Downloads', 'replay'));
   createWindow();
 });
 

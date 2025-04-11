@@ -24,7 +24,12 @@ export function App() {
   useEffect(() => {
     // Listen for video file selections from the menu
     window.electronAPI.onVideoFileSelected((url) => {
+      console.log(url);
       setVideoPath(url);
+    });
+
+    window.electronAPI.onVideoDirectoryChanged((url) => {
+      console.log(url);
     });
   }, []);
 
