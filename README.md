@@ -10,6 +10,29 @@ A video replay tool for FRC teams, built with Electron, React, and Tailwind CSS.
 - Touch screen drawing capabilities
 - Keyboard shortcuts for common actions
 
+## Typical Workflow
+
+1. **Set Video Directory**
+
+   - Use `Ctrl + D` to set the directory where your video files are stored
+   - This directory will be remembered for future sessions
+
+2. **Open Latest Video**
+
+   - Use `Ctrl + Shift + O` to open the most recent video file in the directory
+   - This is useful for quickly accessing the latest match recording
+
+3. **Navigate to Relevant Section**
+
+   - Use horizontal scroll to scrub through the video
+   - For precise control, use `Ctrl + Shift + Left/Right Arrow` to jump in 15-second increments
+   - Adjust playback speed with vertical scroll or keyboard shortcuts
+
+4. **Analyze and Annotate**
+   - Use touch screen or mouse to draw on the video
+   - Change drawing colors using the keyboard shortcuts
+   - Clear drawings with `Escape` when needed
+
 ## Development
 
 ### Prerequisites
@@ -90,6 +113,7 @@ Built executables are available in two places:
 ### File Operations
 
 - `Ctrl + O`: Open video file
+- `Ctrl + Shift + O`: Open specific video file
 - `Ctrl + D`: Set video directory
 - `F11` (Windows) or `Cmd + Ctrl + F` (Mac): Toggle full screen
 
