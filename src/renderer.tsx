@@ -158,7 +158,7 @@ export function App() {
       <Telestrator />
       <SpeedIndicator />
       <Dialog open={showVideoSelector} onOpenChange={setShowVideoSelector}>
-        <DialogContent className="w-[95vw] h-[90vh] max-w-none">
+        <DialogContent className="w-[90vw] h-[90vh] max-w-none">
           <DialogHeader>
             <DialogTitle>Select Video</DialogTitle>
           </DialogHeader>

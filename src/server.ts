@@ -49,7 +49,7 @@ export function startServer(directory: string, port = 3000) {
             timestamps: ['10%'],
             filename: `${videoName}.jpg`,
             folder: thumbnailsDirectory,
-            size: '320x180',
+            size: '1280x720',
           })
           .on('end', resolve)
           .on('error', reject);

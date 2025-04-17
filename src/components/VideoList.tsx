@@ -10,17 +10,17 @@ export type VideoListProps = {
 
 export function VideoList({ videos, onSelectVideo }: VideoListProps) {
   return (
-    <div className="grid grid-cols-1 gap-6 p-6 overflow-y-auto">
+    <div className="grid grid-cols-1 gap-6 p-6 overflow-y-auto w-full">
       {videos.map((video, index) => (
         <DialogClose key={video.url} asChild>
           <div
             className={cn(
-              'flex flex-col items-center gap-4 p-4 hover:bg-gray-100 rounded-md cursor-pointer'
+              'flex items-center gap-4 p-4 hover:bg-gray-100 rounded-md cursor-pointer'
             )}
             onClick={() => onSelectVideo(video)}
           >
-            <VideoThumbnail thumbnailUrl={video.thumbnailUrl} className="w-[90%] aspect-video" />
-            <div className="text-lg font-medium">{video.name}</div>
+            <VideoThumbnail thumbnailUrl={video.thumbnailUrl} className="w-[600px] aspect-video" />
+            <div className="text-2xl font-medium">{video.name}</div>
           </div>
         </DialogClose>
       ))}
