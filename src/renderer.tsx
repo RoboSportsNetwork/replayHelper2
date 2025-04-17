@@ -4,11 +4,23 @@ import { createRoot } from 'react-dom/client';
 import { VideoPlayer } from './components/VideoPlayer';
 import { Telestrator } from './components/Telestrator';
 import { SpeedIndicator } from './components/SpeedIndicator';
+import { VideoThumbnail } from './components/VideoThumbnail';
 import { useVideoControlStore } from './stores/useVideoControlStore';
 import { useDrawingStore } from './stores/useDrawingStore';
 import { RsnLogo } from './components/RsnLogo';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogClose,
+} from './components/ui/dialog';
+import { VideoList } from './components/VideoList';
+import { Video } from './types';
 
 export function App() {
+  const [showVideoSelector, setShowVideoSelector] = useState(false);
+  const [videos, setVideos] = useState<Video[]>([]);
   const [videoPath, setVideoPath] = useState<string | null>(null);
   const { playbackSpeed, setPlaybackSpeed } = useVideoControlStore();
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -33,6 +45,12 @@ export function App() {
     });
   }, []);
 
+  useEffect(() => {
+    window.electronAPI.getAllVideos().then((videos) => {
+      setVideos(videos);
+    });
+  }, [showVideoSelector]);
+
   const updateVideoTime = useCallback(
     (delta: number) => {
       const video = videoRef.current;
@@ -54,6 +72,9 @@ export function App() {
 
   const handleScroll = useCallback(
     (e: WheelEvent) => {
+      if (showVideoSelector || !videoRef.current) return;
+      const isHorizontalScroll = Math.abs(e.deltaX) > Math.abs(e.deltaY);
+      if (!isHorizontalScroll) return;
       e.preventDefault();
       const now = performance.now();
 
@@ -67,19 +88,10 @@ export function App() {
 
       // Schedule the next update
       scrollTimeoutRef.current = requestAnimationFrame(() => {
-        if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-          // Horizontal scroll - scrub through video
-          updateVideoTime(accumulatedScrollRef.current);
-          accumulatedScrollRef.current = 0;
-        } else {
-          // Vertical scroll - adjust playback speed
-          const speedSensitivity = 0.002;
-          const speedChange = e.deltaY * speedSensitivity;
-          const currentSpeed = videoRef.current?.playbackRate || 1;
-          const newSpeed = Math.max(0.1, Math.min(currentSpeed + speedChange, 4));
+        // Horizontal scroll - scrub through video
+        updateVideoTime(accumulatedScrollRef.current);
+        accumulatedScrollRef.current = 0;
 
-          setPlaybackSpeed(newSpeed);
-        }
         lastScrollTimeRef.current = now;
       });
     },
@@ -122,6 +134,9 @@ export function App() {
           break;
       }
     }
+    if (e.ctrlKey && e.code === 'KeyR') {
+      setShowVideoSelector(!showVideoSelector);
+    }
   }, []);
 
   useEffect(() => {
@@ -142,6 +157,14 @@ export function App() {
       {videoPath && <VideoPlayer src={videoPath} ref={videoRef} />}
       <Telestrator />
       <SpeedIndicator />
+      <Dialog open={showVideoSelector} onOpenChange={setShowVideoSelector}>
+        <DialogContent className="w-[95vw] h-[90vh] max-w-none">
+          <DialogHeader>
+            <DialogTitle>Select Video</DialogTitle>
+          </DialogHeader>
+          <VideoList videos={videos} onSelectVideo={(video) => setVideoPath(video.url)} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

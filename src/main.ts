@@ -2,6 +2,7 @@ import { app, BrowserWindow, dialog, ipcMain, Menu, MenuItemConstructorOptions }
 import started from 'electron-squirrel-startup';
 import path from 'node:path';
 import {
+  getAllVideos,
   getLatestVideoUrl,
   getVideoUrl,
   setVideoDirectory,
@@ -145,6 +146,10 @@ ipcMain.handle('open-file-dialog', async () => {
     return getVideoUrl(result.filePaths[0]);
   }
   return null;
+});
+
+ipcMain.handle('get-all-videos', () => {
+  return getAllVideos();
 });
 
 // In this file you can include the rest of your app's specific main process

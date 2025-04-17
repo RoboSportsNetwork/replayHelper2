@@ -16,4 +16,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onVideoDirectoryChanged: (callback: (url: string) => void) => {
     ipcRenderer.on('video-directory-changed', (_event, url) => callback(url));
   },
+  getAllVideos: () => ipcRenderer.invoke('get-all-videos'),
 });
