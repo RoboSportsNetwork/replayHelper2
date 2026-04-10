@@ -6,7 +6,52 @@ import {
   DialogTitle,
 } from './ui/dialog';
 import { Button } from './ui/button';
-import { useSettingsStore, SCRUB_DEFAULTS } from '../stores/useSettingsStore';
+import { useSettingsStore, SCRUB_DEFAULTS, PROXY_DEFAULTS } from '../stores/useSettingsStore';
+
+interface SliderFieldProps {
+  label: string;
+  value: number;
+  displayValue: string;
+  min: number;
+  max: number;
+  step: number;
+  lowLabel: string;
+  highLabel: string;
+  defaultValue: number;
+  description?: string;
+  onChange: (value: number) => void;
+}
+
+function SliderField({
+  label, value, displayValue, min, max, step,
+  lowLabel, highLabel, defaultValue, description, onChange,
+}: SliderFieldProps) {
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <label className="text-sm">{label}</label>
+        <span className="font-mono text-sm text-muted-foreground">{displayValue}</span>
+      </div>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={(e) => onChange(parseFloat(e.target.value))}
+        className="w-full accent-yellow-400 cursor-pointer"
+      />
+      <div className="flex justify-between text-xs text-muted-foreground">
+        <span>{lowLabel}</span>
+        <span className="text-muted-foreground/50">default: {defaultValue}</span>
+        <span>{highLabel}</span>
+      </div>
+      {description && (
+        <p className="text-xs text-muted-foreground/70 leading-relaxed">{description}</p>
+      )}
+    </div>
+  );
+}
 
 interface Props {
   open: boolean;
@@ -14,7 +59,7 @@ interface Props {
 }
 
 export function SettingsDialog({ open, onOpenChange }: Props) {
-  const { scrub, setScrub, resetScrub } = useSettingsStore();
+  const { scrub, setScrub, resetScrub, proxy, setProxy, resetProxy } = useSettingsStore();
 
   const secondsPerNotch = (scrub.sensitivity * scrub.maxDeltaPerEvent).toFixed(2);
 
@@ -31,66 +76,71 @@ export function SettingsDialog({ open, onOpenChange }: Props) {
               Scroll Scrubbing
             </h3>
 
-            {/* Sensitivity */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <label className="text-sm">Scroll Speed</label>
-                <span className="font-mono text-sm text-muted-foreground">
-                  ~{secondsPerNotch}s per notch
-                </span>
-              </div>
-              <input
-                type="range"
-                min={0.001}
-                max={0.05}
-                step={0.001}
-                value={scrub.sensitivity}
-                onChange={(e) => setScrub({ sensitivity: parseFloat(e.target.value) })}
-                className="w-full accent-yellow-400 cursor-pointer"
-              />
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>Slow</span>
-                <span className="text-muted-foreground/50">
-                  default: {SCRUB_DEFAULTS.sensitivity}
-                </span>
-                <span>Fast</span>
-              </div>
-            </div>
+            <SliderField
+              label="Scroll Speed"
+              value={scrub.sensitivity}
+              displayValue={`~${secondsPerNotch}s per notch`}
+              min={0.001}
+              max={0.05}
+              step={0.001}
+              lowLabel="Slow"
+              highLabel="Fast"
+              defaultValue={SCRUB_DEFAULTS.sensitivity}
+              onChange={(v) => setScrub({ sensitivity: v })}
+            />
 
-            {/* Max delta per event */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <label className="text-sm">Scroll Smoothing</label>
-                <span className="font-mono text-sm text-muted-foreground">
-                  {scrub.maxDeltaPerEvent}px cap
-                </span>
-              </div>
-              <input
-                type="range"
-                min={5}
-                max={150}
-                step={5}
-                value={scrub.maxDeltaPerEvent}
-                onChange={(e) => setScrub({ maxDeltaPerEvent: parseInt(e.target.value) })}
-                className="w-full accent-yellow-400 cursor-pointer"
-              />
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>Smooth</span>
-                <span className="text-muted-foreground/50">
-                  default: {SCRUB_DEFAULTS.maxDeltaPerEvent}
-                </span>
-                <span>Responsive</span>
-              </div>
-              <p className="text-xs text-muted-foreground/70 leading-relaxed">
-                Lower values reduce jumpy behavior from mouse tilt wheels (Windows). Higher
-                values give raw, unfiltered scroll input.
-              </p>
-            </div>
+            <SliderField
+              label="Scroll Smoothing"
+              value={scrub.maxDeltaPerEvent}
+              displayValue={`${scrub.maxDeltaPerEvent}px cap`}
+              min={5}
+              max={150}
+              step={5}
+              lowLabel="Smooth"
+              highLabel="Responsive"
+              defaultValue={SCRUB_DEFAULTS.maxDeltaPerEvent}
+              description="Lower values reduce jumpy behavior from mouse tilt wheels (Windows). Higher values give raw, unfiltered scroll input."
+              onChange={(v) => setScrub({ maxDeltaPerEvent: v })}
+            />
+
+            <SliderField
+              label="Speed Change Sensitivity"
+              value={scrub.verticalScrollThreshold}
+              displayValue={`${scrub.verticalScrollThreshold}px`}
+              min={20}
+              max={300}
+              step={10}
+              lowLabel="Touchy"
+              highLabel="Steady"
+              defaultValue={SCRUB_DEFAULTS.verticalScrollThreshold}
+              description="Pixels of vertical scroll accumulated before stepping to the next playback speed. Lower values make speed changes more responsive; higher values prevent accidental changes."
+              onChange={(v) => setScrub({ verticalScrollThreshold: v })}
+            />
+          </section>
+
+          <section className="border-t border-border pt-4 space-y-4">
+            <h3 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+              Proxy Generation
+            </h3>
+
+            <SliderField
+              label="Frames per Keyframe"
+              value={proxy.keyframeInterval}
+              displayValue={`${proxy.keyframeInterval}f\u00a0·\u00a0~${(proxy.keyframeInterval / 30).toFixed(1)}s seek`}
+              min={1}
+              max={300}
+              step={1}
+              lowLabel="Precise (slow encode)"
+              highLabel="Fast (coarse seeks)"
+              defaultValue={PROXY_DEFAULTS.keyframeInterval}
+              description="Lower = more keyframes, smoother scrubbing, slower to generate. Changes apply to new videos only — delete the proxy file to regenerate an existing one."
+              onChange={(v) => setProxy({ keyframeInterval: v })}
+            />
           </section>
         </div>
 
         <DialogFooter>
-          <Button variant="ghost" size="sm" onClick={resetScrub}>
+          <Button variant="ghost" size="sm" onClick={() => { resetScrub(); resetProxy(); }}>
             Reset to defaults
           </Button>
           <Button size="sm" onClick={() => onOpenChange(false)}>

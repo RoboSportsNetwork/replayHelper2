@@ -117,7 +117,7 @@ export function getLatestVideoUrl(): string {
   return getVideoUrl(path.join(videoDirectory, latestFile.name));
 }
 
-export function generateProxy(videoUrl: string): Promise<string> {
+export function generateProxy(videoUrl: string, keyframeInterval = 30): Promise<string> {
   const encodedName = videoUrl.split('/videos/')[1];
   const videoName = decodeURIComponent(encodedName);
   const videoPath = path.join(videoDirectory, videoName);
@@ -132,9 +132,9 @@ export function generateProxy(videoUrl: string): Promise<string> {
   return new Promise((resolve, reject) => {
     ffmpeg(videoPath)
       .videoCodec('libx264')
-      .addOutputOption('-g', '1')
-      .addOutputOption('-crf', '18')
-      .addOutputOption('-preset', 'veryfast')
+      .addOutputOption('-g', String(keyframeInterval))
+      .addOutputOption('-crf', '23')
+      .addOutputOption('-preset', 'ultrafast')
       .noAudio()
       .output(proxyPath)
       .on('end', () => resolve(proxyUrl))

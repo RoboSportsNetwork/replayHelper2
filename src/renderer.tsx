@@ -30,7 +30,7 @@ export function App() {
   const [proxyPath, setProxyPath] = useState<string | null>(null);
   const [proxyGenerating, setProxyGenerating] = useState(false);
   const { playbackSpeed, setPlaybackSpeed } = useVideoControlStore();
-  const { scrub, loadSettings } = useSettingsStore();
+  const { scrub, proxy, loadSettings } = useSettingsStore();
   const videoRef = useRef<HTMLVideoElement>(null);
   const { clearDrawings } = useDrawingStore();
   const scrollTimeoutRef = useRef<number | undefined>(undefined);
@@ -51,7 +51,7 @@ export function App() {
     if (!videoPath) return;
     setProxyPath(null);
     setProxyGenerating(true);
-    window.electronAPI.generateProxy(videoPath).then((url) => {
+    window.electronAPI.generateProxy(videoPath, proxy.keyframeInterval).then((url) => {
       // Preserve playback position when switching to proxy
       const currentTime = videoRef.current?.currentTime ?? 0;
       setProxyPath(url);
@@ -111,10 +111,9 @@ export function App() {
         const pixelDeltaY =
           e.deltaMode === 1 ? e.deltaY * 16 : e.deltaMode === 2 ? e.deltaY * 600 : e.deltaY;
         verticalAccumRef.current += pixelDeltaY;
-        const STEP_THRESHOLD = 100;
-        while (Math.abs(verticalAccumRef.current) >= STEP_THRESHOLD) {
+        while (Math.abs(verticalAccumRef.current) >= scrub.verticalScrollThreshold) {
           const direction = verticalAccumRef.current < 0 ? 1 : -1; // scroll up = faster
-          verticalAccumRef.current -= Math.sign(verticalAccumRef.current) * STEP_THRESHOLD;
+          verticalAccumRef.current -= Math.sign(verticalAccumRef.current) * scrub.verticalScrollThreshold;
           const currentIndex = SPEED_STEPS.indexOf(playbackSpeed);
           const newIndex = Math.max(0, Math.min(SPEED_STEPS.length - 1, currentIndex + direction));
           if (newIndex !== currentIndex) setPlaybackSpeed(SPEED_STEPS[newIndex]);
@@ -148,7 +147,7 @@ export function App() {
         lastScrollTimeRef.current = now;
       });
     },
-    [updateVideoTime, setPlaybackSpeed, scrub.maxDeltaPerEvent, playbackSpeed]
+    [updateVideoTime, setPlaybackSpeed, scrub.maxDeltaPerEvent, scrub.verticalScrollThreshold, playbackSpeed]
   );
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {

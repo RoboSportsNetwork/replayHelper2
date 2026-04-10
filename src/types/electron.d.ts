@@ -5,7 +5,7 @@ interface ElectronAPI {
   onVideoFileSelected: (callback: (url: string) => void) => void;
   onVideoDirectoryChanged: (callback: (url: string) => void) => void;
   getAllVideos: () => Promise<Video[]>;
-  generateProxy: (videoUrl: string) => Promise<string>;
+  generateProxy: (videoUrl: string, keyframeInterval: number) => Promise<string>;
   loadSettings: () => Promise<Record<string, unknown> | null>;
   saveSettings: (settings: Record<string, unknown>) => Promise<void>;
 }

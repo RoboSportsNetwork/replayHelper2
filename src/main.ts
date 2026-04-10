@@ -158,8 +158,8 @@ ipcMain.handle('get-all-videos', () => {
   return getAllVideos();
 });
 
-ipcMain.handle('generate-proxy', (_event, videoUrl: string) => {
-  return generateProxy(videoUrl);
+ipcMain.handle('generate-proxy', (_event, videoUrl: string, keyframeInterval: number) => {
+  return generateProxy(videoUrl, keyframeInterval);
 });
 
 const settingsPath = () => path.join(app.getPath('userData'), 'settings.json');
