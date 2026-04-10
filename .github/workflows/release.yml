@@ -1,22 +1,11 @@
-name: Create Release
-
+# Release handling has been consolidated into build.yml.
+# Pushing a v* tag triggers a build on all platforms and automatically
+# attaches the installers to a GitHub Release.
+name: Release (deprecated)
 on:
-  push:
-    tags:
-      - 'v*'
-
+  workflow_dispatch:
 jobs:
-  create-release:
+  info:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            out/make/*.deb
-            out/make/*.exe
-            out/make/*.zip
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: echo "Release handling has moved to build.yml. Push a v* tag to trigger a release build."
