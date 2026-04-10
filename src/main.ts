@@ -2,6 +2,7 @@ import { app, BrowserWindow, dialog, ipcMain, Menu, MenuItemConstructorOptions }
 import started from 'electron-squirrel-startup';
 import path from 'node:path';
 import {
+  generateProxy,
   getAllVideos,
   getLatestVideoUrl,
   getVideoUrl,
@@ -150,6 +151,10 @@ ipcMain.handle('open-file-dialog', async () => {
 
 ipcMain.handle('get-all-videos', () => {
   return getAllVideos();
+});
+
+ipcMain.handle('generate-proxy', (_event, videoUrl: string) => {
+  return generateProxy(videoUrl);
 });
 
 // In this file you can include the rest of your app's specific main process

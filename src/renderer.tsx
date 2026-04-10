@@ -22,6 +22,8 @@ export function App() {
   const [showVideoSelector, setShowVideoSelector] = useState(false);
   const [videos, setVideos] = useState<Video[]>([]);
   const [videoPath, setVideoPath] = useState<string | null>(null);
+  const [proxyPath, setProxyPath] = useState<string | null>(null);
+  const [proxyGenerating, setProxyGenerating] = useState(false);
   const { playbackSpeed, setPlaybackSpeed } = useVideoControlStore();
   const videoRef = useRef<HTMLVideoElement>(null);
   const { clearDrawings } = useDrawingStore();
@@ -32,6 +34,23 @@ export function App() {
   useEffect(() => {
     clearDrawings();
   }, [videoPath, clearDrawings]);
+
+  // Generate scrub proxy whenever a new video is loaded
+  useEffect(() => {
+    if (!videoPath) return;
+    setProxyPath(null);
+    setProxyGenerating(true);
+    window.electronAPI.generateProxy(videoPath).then((url) => {
+      // Preserve playback position when switching to proxy
+      const currentTime = videoRef.current?.currentTime ?? 0;
+      setProxyPath(url);
+      setProxyGenerating(false);
+      // Restore position after the src change re-renders
+      requestAnimationFrame(() => {
+        if (videoRef.current) videoRef.current.currentTime = currentTime;
+      });
+    }).catch(() => setProxyGenerating(false));
+  }, [videoPath]);
 
   useEffect(() => {
     // Listen for video file selections from the menu
@@ -154,9 +173,14 @@ export function App() {
   return (
     <div className="fixed inset-0 bg-black">
       <RsnLogo className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 fill-[#FFCC00]/40" />
-      {videoPath && <VideoPlayer src={videoPath} ref={videoRef} />}
+      {videoPath && <VideoPlayer src={proxyPath ?? videoPath} ref={videoRef} />}
       <Telestrator />
       <SpeedIndicator />
+      {proxyGenerating && (
+        <div className="fixed bottom-4 left-4 bg-black/70 text-white/70 px-3 py-1 rounded-lg text-xs font-mono">
+          generating scrub proxy...
+        </div>
+      )}
       <Dialog open={showVideoSelector} onOpenChange={setShowVideoSelector}>
         <DialogContent className="w-[90vw] h-[90vh] max-w-none">
           <DialogHeader>
