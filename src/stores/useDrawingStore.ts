@@ -15,7 +15,7 @@ export interface Drawing {
 interface DrawingState {
   drawings: Drawing[];
   lineColor: LineColor;
-  setDrawings: (drawings: Drawing[]) => void;
+  addDrawing: (drawing: Drawing) => void;
   setLineColor: (color: LineColor) => void;
   clearDrawings: () => void;
 }
@@ -23,7 +23,7 @@ interface DrawingState {
 export const useDrawingStore = create<DrawingState>((set) => ({
   drawings: [],
   lineColor: 'yellow',
-  setDrawings: (drawings) => set({ drawings }),
+  addDrawing: (drawing) => set((state) => ({ drawings: [...state.drawings, drawing] })),
   setLineColor: (color) => set({ lineColor: color }),
   clearDrawings: () => set({ drawings: [] }),
 }));
