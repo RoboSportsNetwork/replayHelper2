@@ -1,60 +1,68 @@
-name: Build and Release
+name: Build
 
 on:
   push:
     branches: [main]
-  release:
-    types: [created]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
 
 jobs:
   build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
 
+      - name: Install Linux build dependencies
+        if: matrix.os == 'ubuntu-latest'
+        run: sudo apt-get install -y rpm fakeroot
+
       - name: Install dependencies
-        run: |
-          npm ci
-          npm install -D @types/node ts-node
+        run: npm ci
 
-      - name: Build
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          export NODE_OPTIONS=--max_old_space_size=4096
-          npx electron-forge make
+      - name: Make (Linux / macOS)
+        if: matrix.os != 'windows-latest'
+        run: npx electron-forge make
+        env:
+          NODE_OPTIONS: --max_old_space_size=4096
 
-      - name: Build Windows
+      - name: Make (Windows)
         if: matrix.os == 'windows-latest'
-        run: |
-          $env:NODE_OPTIONS="--max_old_space_size=4096"
-          npx electron-forge make --config=forge.config.js
+        run: npx electron-forge make --config=forge.config.js
+        env:
+          NODE_OPTIONS: --max_old_space_size=4096
 
-      - name: List build artifacts (Ubuntu)
-        if: matrix.os == 'ubuntu-latest'
-        run: ls -R out/
-
-      - name: List build artifacts (Windows)
-        if: matrix.os == 'windows-latest'
-        run: Get-ChildItem -Path out -Recurse -File | Select-Object FullName
-
-      - name: Upload artifacts
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: replayhelper-${{ matrix.os }}
           path: |
             out/make/**/*.deb
+            out/make/**/*.rpm
             out/make/**/*.exe
             out/make/**/*.zip
-            out/make/**/*.AppImage
             out/make/**/*.dmg
             config/logitech/**
+
+      - name: Attach to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            out/make/**/*.deb
+            out/make/**/*.rpm
+            out/make/**/*.exe
+            out/make/**/*.zip
+            out/make/**/*.dmg
+            config/logitech/**
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
