@@ -123,19 +123,44 @@ export function SettingsDialog({ open, onOpenChange }: Props) {
               Proxy Generation
             </h3>
 
-            <SliderField
-              label="Frames per Keyframe"
-              value={proxy.keyframeInterval}
-              displayValue={`${proxy.keyframeInterval}f\u00a0·\u00a0~${(proxy.keyframeInterval / 30).toFixed(1)}s seek`}
-              min={1}
-              max={300}
-              step={1}
-              lowLabel="Precise (slow encode)"
-              highLabel="Fast (coarse seeks)"
-              defaultValue={PROXY_DEFAULTS.keyframeInterval}
-              description="Lower = more keyframes, smoother scrubbing, slower to generate. Changes apply to new videos only — delete the proxy file to regenerate an existing one."
-              onChange={(v) => setProxy({ keyframeInterval: v })}
-            />
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <label className="text-sm">Enable Scrub Proxy</label>
+                <p className="text-xs text-muted-foreground/70 leading-relaxed">
+                  Generates a seek-optimized video for smooth scrubbing. Disable to use the original file directly.
+                </p>
+              </div>
+              <button
+                role="switch"
+                aria-checked={proxy.enabled}
+                onClick={() => setProxy({ enabled: !proxy.enabled })}
+                className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                  proxy.enabled ? 'bg-yellow-400' : 'bg-muted'
+                }`}
+              >
+                <span
+                  className={`pointer-events-none block h-4 w-4 rounded-full bg-background shadow-lg ring-0 transition-transform ${
+                    proxy.enabled ? 'translate-x-4' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
+
+            {proxy.enabled && (
+              <SliderField
+                label="Frames per Keyframe"
+                value={proxy.keyframeInterval}
+                displayValue={`${proxy.keyframeInterval}f\u00a0·\u00a0~${(proxy.keyframeInterval / 30).toFixed(1)}s seek`}
+                min={1}
+                max={300}
+                step={1}
+                lowLabel="Precise (slow encode)"
+                highLabel="Fast (coarse seeks)"
+                defaultValue={PROXY_DEFAULTS.keyframeInterval}
+                description="Lower = more keyframes, smoother scrubbing, slower to generate. Changes apply to new videos only — delete the proxy file to regenerate an existing one."
+                onChange={(v) => setProxy({ keyframeInterval: v })}
+              />
+            )}
           </section>
         </div>
 

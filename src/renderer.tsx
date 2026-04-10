@@ -50,6 +50,7 @@ export function App() {
   useEffect(() => {
     if (!videoPath) return;
     setProxyPath(null);
+    if (!proxy.enabled) return;
     setProxyGenerating(true);
     window.electronAPI.generateProxy(videoPath, proxy.keyframeInterval).then((url) => {
       // Preserve playback position when switching to proxy
@@ -61,7 +62,7 @@ export function App() {
         if (videoRef.current) videoRef.current.currentTime = currentTime;
       });
     }).catch(() => setProxyGenerating(false));
-  }, [videoPath]);
+  }, [videoPath, proxy.enabled]);
 
   useEffect(() => {
     // Listen for video file selections from the menu

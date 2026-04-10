@@ -7,7 +7,8 @@ export interface ScrubSettings {
 }
 
 export interface ProxySettings {
-  keyframeInterval: number; // frames between keyframes in the scrub proxy (default: 30)
+  enabled: boolean;            // whether to generate a scrub proxy (default: true)
+  keyframeInterval: number;    // frames between keyframes in the scrub proxy (default: 30)
 }
 
 export const SCRUB_DEFAULTS: ScrubSettings = {
@@ -17,6 +18,7 @@ export const SCRUB_DEFAULTS: ScrubSettings = {
 };
 
 export const PROXY_DEFAULTS: ProxySettings = {
+  enabled: true,
   keyframeInterval: 30,
 };
 
