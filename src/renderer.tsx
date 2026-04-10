@@ -20,6 +20,8 @@ import {
 import { VideoList } from './components/VideoList';
 import { Video } from './types';
 
+const SPEED_STEPS = [0.25, 0.5, 1, 2];
+
 export function App() {
   const [showVideoSelector, setShowVideoSelector] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -34,6 +36,7 @@ export function App() {
   const scrollTimeoutRef = useRef<number | undefined>(undefined);
   const lastScrollTimeRef = useRef<number>(0);
   const accumulatedScrollRef = useRef<number>(0);
+  const verticalAccumRef = useRef<number>(0);
 
   useEffect(() => {
     loadSettings();
@@ -100,8 +103,25 @@ export function App() {
     (e: WheelEvent) => {
       if (showVideoSelector || !videoRef.current) return;
       const isHorizontalScroll = Math.abs(e.deltaX) > Math.abs(e.deltaY);
-      if (!isHorizontalScroll) return;
       e.preventDefault();
+
+      if (!isHorizontalScroll) {
+        // Vertical scroll — step through playback speeds.
+        // Accumulate so trackpad gestures feel natural and mouse notches step once per click.
+        const pixelDeltaY =
+          e.deltaMode === 1 ? e.deltaY * 16 : e.deltaMode === 2 ? e.deltaY * 600 : e.deltaY;
+        verticalAccumRef.current += pixelDeltaY;
+        const STEP_THRESHOLD = 100;
+        while (Math.abs(verticalAccumRef.current) >= STEP_THRESHOLD) {
+          const direction = verticalAccumRef.current < 0 ? 1 : -1; // scroll up = faster
+          verticalAccumRef.current -= Math.sign(verticalAccumRef.current) * STEP_THRESHOLD;
+          const currentIndex = SPEED_STEPS.indexOf(playbackSpeed);
+          const newIndex = Math.max(0, Math.min(SPEED_STEPS.length - 1, currentIndex + direction));
+          if (newIndex !== currentIndex) setPlaybackSpeed(SPEED_STEPS[newIndex]);
+        }
+        return;
+      }
+
       const now = performance.now();
 
       // Normalize delta: deltaMode=1 (line) is common on Windows mice, convert to pixels.
@@ -128,7 +148,7 @@ export function App() {
         lastScrollTimeRef.current = now;
       });
     },
-    [updateVideoTime, setPlaybackSpeed, scrub.maxDeltaPerEvent]
+    [updateVideoTime, setPlaybackSpeed, scrub.maxDeltaPerEvent, playbackSpeed]
   );
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
