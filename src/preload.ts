@@ -18,4 +18,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
   getAllVideos: () => ipcRenderer.invoke('get-all-videos'),
   generateProxy: (videoUrl: string) => ipcRenderer.invoke('generate-proxy', videoUrl),
+  loadSettings: () => ipcRenderer.invoke('load-settings'),
+  saveSettings: (settings: object) => ipcRenderer.invoke('save-settings', settings),
 });

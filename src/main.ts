@@ -1,6 +1,7 @@
 import { app, BrowserWindow, dialog, ipcMain, Menu, MenuItemConstructorOptions } from 'electron';
 import started from 'electron-squirrel-startup';
 import path from 'node:path';
+import fs from 'node:fs';
 import {
   generateProxy,
   getAllVideos,
@@ -159,6 +160,24 @@ ipcMain.handle('get-all-videos', () => {
 
 ipcMain.handle('generate-proxy', (_event, videoUrl: string) => {
   return generateProxy(videoUrl);
+});
+
+const settingsPath = () => path.join(app.getPath('userData'), 'settings.json');
+
+ipcMain.handle('load-settings', () => {
+  try {
+    return JSON.parse(fs.readFileSync(settingsPath(), 'utf-8'));
+  } catch {
+    return null;
+  }
+});
+
+ipcMain.handle('save-settings', (_event, settings: object) => {
+  try {
+    fs.writeFileSync(settingsPath(), JSON.stringify(settings, null, 2), 'utf-8');
+  } catch (e) {
+    console.error('Failed to save settings:', e);
+  }
 });
 
 // In this file you can include the rest of your app's specific main process
