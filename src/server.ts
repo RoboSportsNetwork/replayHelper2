@@ -129,10 +129,9 @@ export function generateProxy(videoUrl: string): Promise<string> {
 
   return new Promise((resolve, reject) => {
     ffmpeg(videoPath)
-      .videoFilters('scale=-2:720')
       .videoCodec('libx264')
       .addOutputOption('-g', '1')
-      .addOutputOption('-crf', '28')
+      .addOutputOption('-crf', '18')
       .addOutputOption('-preset', 'veryfast')
       .noAudio()
       .output(proxyPath)
