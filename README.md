@@ -4,10 +4,10 @@ A video replay tool for FRC teams, built with Electron, React, and Tailwind CSS.
 
 ## Features
 
-- Open and play local video files
+- Browse and play local video files with thumbnail previews
+- Open any video file directly or quickly load the most recent recording
 - Horizontal scroll to scrub through video
-- Vertical scroll to adjust playback speed
-- Touch screen drawing capabilities
+- Touch screen drawing / telestrator capabilities
 - Keyboard shortcuts for common actions
 
 ## Typical Workflow
@@ -15,18 +15,20 @@ A video replay tool for FRC teams, built with Electron, React, and Tailwind CSS.
 1. **Set Video Directory**
 
    - Use `Ctrl + D` to set the directory where your video files are stored
+   - The app defaults to `~/Downloads/replay` on startup
    - This directory will be remembered for future sessions
 
-2. **Open Latest Video**
+2. **Select a Video**
 
-   - Use `Ctrl + Shift + O` to open the most recent video file in the directory
-   - This is useful for quickly accessing the latest match recording
+   - Use `Ctrl + R` to open the video selector — a browsable list of all videos in the directory, each showing a thumbnail preview
+   - Use `Ctrl + O` to instantly open the most recent video file in the directory
+   - Use `Ctrl + Shift + O` to browse and open any specific file
 
 3. **Navigate to Relevant Section**
 
    - Use horizontal scroll to scrub through the video
    - For precise control, use `Ctrl + Shift + Left/Right Arrow` to jump in 15-second increments
-   - Adjust playback speed with vertical scroll or keyboard shortcuts
+   - Adjust playback speed with keyboard shortcuts
 
 4. **Analyze and Annotate**
    - Use touch screen or mouse to draw on the video
@@ -39,6 +41,7 @@ A video replay tool for FRC teams, built with Electron, React, and Tailwind CSS.
 
 - Node.js 20 or later
 - npm
+- ffmpeg (required for thumbnail generation)
 
 ### Setup
 
@@ -93,7 +96,7 @@ Built executables are available in two places:
 
 ### Video Controls
 
-- `Ctrl + Space`: Play/Pause
+- `Space`: Play/Pause
 - `Ctrl + Shift + Left Arrow`: Jump back 15 seconds
 - `Ctrl + Shift + Right Arrow`: Jump forward 15 seconds
 - `Ctrl + Shift + 1`: Set playback speed to 1x
@@ -112,24 +115,24 @@ Built executables are available in two places:
 
 ### File Operations
 
-- `Ctrl + O`: Open video file
-- `Ctrl + Shift + O`: Open specific video file
+- `Ctrl + O`: Open latest video in directory
+- `Ctrl + Shift + O`: Open a specific video file
+- `Ctrl + R`: Open video selector (browse all videos with thumbnails)
 - `Ctrl + D`: Set video directory
 - `F11` (Windows) or `Cmd + Ctrl + F` (Mac): Toggle full screen
+
+> **Mac users:** `Ctrl` shortcuts use `Cmd` instead (e.g., `Cmd + O`, `Cmd + D`).
 
 ## Scroll Interactions
 
 - **Horizontal Scroll**: Scrub through the video timeline
-
   - Scroll left to move backward in time
   - Scroll right to move forward in time
   - Scrolling speed is affected by current playback speed
 
-- **Vertical Scroll**: Adjust playback speed
-  - Scroll up to increase playback speed
-  - Scroll down to decrease playback speed
-  - Speed range: 0.1x to 4x
-  - Current speed is displayed in the bottom-right corner
+## How It Works
+
+The app runs a local HTTP server (port 3000) to serve video files from the configured directory. When the video selector is opened, thumbnails are automatically generated using ffmpeg and cached in a `thumbnails/` subfolder inside the video directory.
 
 ## Logitech MX Creative Console Configuration
 
