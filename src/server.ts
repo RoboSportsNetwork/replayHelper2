@@ -95,8 +95,10 @@ export function getVideoUrl(filePath: string): string {
 }
 
 export function getLatestVideoUrl(): string {
+  const videoExtensions = ['.mp4', '.mov', '.avi', '.mkv', '.webm', '.wmv'];
   const files = fs.readdirSync(videoDirectory);
   const filesWithStats = files
+    .filter((file) => videoExtensions.some((ext) => file.toLowerCase().endsWith(ext)))
     .map((file) => {
       const filePath = path.join(videoDirectory, file);
       const stats = fs.statSync(filePath);

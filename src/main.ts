@@ -29,7 +29,11 @@ const createMenu = (mainWindow: BrowserWindow) => {
           label: 'Open Latest...',
           accelerator: isMac ? 'Command+O' : 'Ctrl+O',
           click: async () => {
-            mainWindow.webContents.send('video-file-selected', getLatestVideoUrl());
+            try {
+              mainWindow.webContents.send('video-file-selected', getLatestVideoUrl());
+            } catch (e) {
+              dialog.showErrorBox('No video found', (e as Error).message);
+            }
           },
         },
         {
