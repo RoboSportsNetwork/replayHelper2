@@ -17,4 +17,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.on('video-directory-changed', (_event, url) => callback(url));
   },
   getAllVideos: () => ipcRenderer.invoke('get-all-videos'),
+  generateProxy: (videoUrl: string, keyframeInterval: number) => ipcRenderer.invoke('generate-proxy', videoUrl, keyframeInterval),
+  loadSettings: () => ipcRenderer.invoke('load-settings'),
+  saveSettings: (settings: object) => ipcRenderer.invoke('save-settings', settings),
 });

@@ -47,8 +47,11 @@ const handleKeyDown = (e: KeyboardEvent) => {
       case 'Digit9':
         useDrawingStore.getState().setLineColor('blue');
         break;
-      case 'Digit0':
+      case 'Minus':
         useDrawingStore.getState().setLineColor('white');
+        break;
+      case 'Equal':
+        useDrawingStore.getState().setLineColor('black');
         break;
     }
   }

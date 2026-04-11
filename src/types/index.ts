@@ -7,6 +7,7 @@ declare global {
       onVideoFileSelected(callback: (url: string) => void): void;
       onVideoDirectoryChanged(callback: (url: string) => void): void;
       getAllVideos(): Promise<{ name: string; url: string; thumbnailUrl: string }[]>;
+      generateProxy(videoUrl: string, keyframeInterval: number): Promise<string>;
     };
   }
 }

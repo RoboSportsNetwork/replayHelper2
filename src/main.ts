@@ -1,7 +1,9 @@
 import { app, BrowserWindow, dialog, ipcMain, Menu, MenuItemConstructorOptions } from 'electron';
 import started from 'electron-squirrel-startup';
 import path from 'node:path';
+import fs from 'node:fs';
 import {
+  generateProxy,
   getAllVideos,
   getLatestVideoUrl,
   getVideoUrl,
@@ -28,7 +30,11 @@ const createMenu = (mainWindow: BrowserWindow) => {
           label: 'Open Latest...',
           accelerator: isMac ? 'Command+O' : 'Ctrl+O',
           click: async () => {
-            mainWindow.webContents.send('video-file-selected', getLatestVideoUrl());
+            try {
+              mainWindow.webContents.send('video-file-selected', getLatestVideoUrl());
+            } catch (e) {
+              dialog.showErrorBox('No video found', (e as Error).message);
+            }
           },
         },
         {
@@ -150,6 +156,28 @@ ipcMain.handle('open-file-dialog', async () => {
 
 ipcMain.handle('get-all-videos', () => {
   return getAllVideos();
+});
+
+ipcMain.handle('generate-proxy', (_event, videoUrl: string, keyframeInterval: number) => {
+  return generateProxy(videoUrl, keyframeInterval);
+});
+
+const settingsPath = () => path.join(app.getPath('userData'), 'settings.json');
+
+ipcMain.handle('load-settings', () => {
+  try {
+    return JSON.parse(fs.readFileSync(settingsPath(), 'utf-8'));
+  } catch {
+    return null;
+  }
+});
+
+ipcMain.handle('save-settings', (_event, settings: object) => {
+  try {
+    fs.writeFileSync(settingsPath(), JSON.stringify(settings, null, 2), 'utf-8');
+  } catch (e) {
+    console.error('Failed to save settings:', e);
+  }
 });
 
 // In this file you can include the rest of your app's specific main process

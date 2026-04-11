@@ -8,6 +8,7 @@ const server = express();
 let serverInstance: any = null;
 let videoDirectory: string = path.join(app.getPath('home'), 'Downloads', 'replay');
 let thumbnailsDirectory = path.join(videoDirectory, 'thumbnails');
+let proxiesDirectory = path.join(videoDirectory, 'proxies');
 
 export function startServer(directory: string, port = 3000) {
   if (serverInstance) {
@@ -16,11 +17,16 @@ export function startServer(directory: string, port = 3000) {
 
   videoDirectory = directory;
   thumbnailsDirectory = path.join(videoDirectory, 'thumbnails');
+  proxiesDirectory = path.join(videoDirectory, 'proxies');
 
-  // Ensure thumbnails directory exists
+  // Ensure thumbnails and proxies directories exist
   if (!fs.existsSync(thumbnailsDirectory)) {
     console.log('thumbnails directory does not exist.  creating...');
     fs.mkdirSync(thumbnailsDirectory, { recursive: true });
+  }
+  if (!fs.existsSync(proxiesDirectory)) {
+    console.log('proxies directory does not exist.  creating...');
+    fs.mkdirSync(proxiesDirectory, { recursive: true });
   }
 
   serverInstance = server.listen(port, () => {
@@ -29,6 +35,7 @@ export function startServer(directory: string, port = 3000) {
 
   server.use('/videos', express.static(videoDirectory));
   server.use('/thumbnails', express.static(thumbnailsDirectory));
+  server.use('/proxies', express.static(proxiesDirectory));
 
   // Thumbnail generation endpoint
   server.get('/thumbnail/:videoName', async (req, res) => {
@@ -88,8 +95,10 @@ export function getVideoUrl(filePath: string): string {
 }
 
 export function getLatestVideoUrl(): string {
+  const videoExtensions = ['.mp4', '.mov', '.avi', '.mkv', '.webm', '.wmv'];
   const files = fs.readdirSync(videoDirectory);
   const filesWithStats = files
+    .filter((file) => videoExtensions.some((ext) => file.toLowerCase().endsWith(ext)))
     .map((file) => {
       const filePath = path.join(videoDirectory, file);
       const stats = fs.statSync(filePath);
@@ -106,6 +115,32 @@ export function getLatestVideoUrl(): string {
     throw new Error('No video files found in the directory');
   }
   return getVideoUrl(path.join(videoDirectory, latestFile.name));
+}
+
+export function generateProxy(videoUrl: string, keyframeInterval = 30): Promise<string> {
+  const encodedName = videoUrl.split('/videos/')[1];
+  const videoName = decodeURIComponent(encodedName);
+  const videoPath = path.join(videoDirectory, videoName);
+  const proxyName = `${videoName}.proxy.mp4`;
+  const proxyPath = path.join(proxiesDirectory, proxyName);
+  const proxyUrl = `http://localhost:3000/proxies/${encodeURIComponent(proxyName)}`;
+
+  if (fs.existsSync(proxyPath)) {
+    return Promise.resolve(proxyUrl);
+  }
+
+  return new Promise((resolve, reject) => {
+    ffmpeg(videoPath)
+      .videoCodec('libx264')
+      .addOutputOption('-g', String(keyframeInterval))
+      .addOutputOption('-crf', '23')
+      .addOutputOption('-preset', 'ultrafast')
+      .noAudio()
+      .output(proxyPath)
+      .on('end', () => resolve(proxyUrl))
+      .on('error', reject)
+      .run();
+  });
 }
 
 export function getAllVideos(): { name: string; url: string; thumbnailUrl: string }[] {
